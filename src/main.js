@@ -7,10 +7,9 @@ const ENDPOINT=`${SUPABASE_URL}/functions/v1/careers-submit`;
 const MAX_FILE=5*1024*1024;
 const DAYS=['sun','mon','tue','wed','thu','fri','sat'];
 const DRAFT_KEY='hd-careers-draft';
-// Temporary: required-field checks are off so every step can be clicked through while the
-// flow is reviewed. Set back to true before launch. The careers-submit function still
-// validates on submit, so an incomplete application is rejected with a message.
-const ENFORCE_REQUIRED=false;
+// Client-side required-field checks. The careers-submit function validates again on
+// submit, so this is for guidance, not security.
+const ENFORCE_REQUIRED=true;
 const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=(sel,root=document)=>root.querySelector(sel);
 
@@ -150,7 +149,8 @@ history.replaceState({step},'');
 const refocusUpload=kind=>$(`[data-field="${kind}"] .btn.small`)?.focus();
 // ---- Events ----
 const form=$('#form');
-form.addEventListener('submit',ev=>{ev.preventDefault();formError='';if(!validateStep()){render();return;}if(step<3)goStep(step+1);else submit();});
+// On failure the field errors are already in the DOM; re-rendering would wipe them.
+form.addEventListener('submit',ev=>{ev.preventDefault();formError='';if(!validateStep()){const fe=$('.form-error');if(fe){fe.textContent=formError;fe.hidden=!formError;}return;}if(step<3)goStep(step+1);else submit();});
 form.addEventListener('input',ev=>{const el=ev.target;if(el.name&&el.name in data&&el.type!=='checkbox'){data[el.name]=el.value;el.classList.remove('placeholder');setError(el.name,'');saveDraft();}
  const d=el.dataset.dayFrom||el.dataset.dayTo;if(d){data.availability[d][el.dataset.dayFrom?'from':'to']=el.value;setError('availability','');saveDraft();}});
 form.addEventListener('change',async ev=>{const el=ev.target;
