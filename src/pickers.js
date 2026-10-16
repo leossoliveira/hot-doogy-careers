@@ -46,7 +46,7 @@ function openPopover(trigger,pop,{matchWidth=true,onKey,title=''}={}){
  document.body.append(pop);trigger.setAttribute('aria-expanded','true');trigger.closest('.picker')?.classList.add('open');
  const reposition=()=>{if(!trigger.isConnected){closePicker();return;}place(pop,trigger,{matchWidth});};
  const outside=e=>{if(!pop.contains(e.target)&&!trigger.contains(e.target)&&e.target!==backdrop)closePicker();};
- const key=e=>{if(e.key==='Escape'){e.preventDefault();closePicker(true);}else if(e.key==='Tab'){closePicker();}else onKey?.(e);};
+ const key=e=>{if(e.key==='Escape'){e.preventDefault();closePicker(true);}else if(e.key==='Tab'){closePicker(true);}else onKey?.(e);};
  reposition();
  window.addEventListener('resize',reposition);window.addEventListener('scroll',reposition,true);document.addEventListener('pointerdown',outside,true);pop.addEventListener('keydown',key);
  open={pop,trigger,backdrop,cleanup:()=>{window.removeEventListener('resize',reposition);window.removeEventListener('scroll',reposition,true);document.removeEventListener('pointerdown',outside,true);}};
@@ -121,7 +121,7 @@ function openCalendar(trigger,input,{lang,labels,onPick}){
   const prevDisabled=!!min&&addMonths(`${view}-01`,-1).slice(0,7)<min.slice(0,7);
   pop.innerHTML=`<div class="hd-cal-head"><button type="button" class="hd-cal-nav" data-nav="-1" aria-label="${esc(labels.prev_month)}" ${prevDisabled?'disabled':''}>${ARROW('prev')}</button><strong aria-live="polite">${esc(monthTitle(view))}</strong><button type="button" class="hd-cal-nav" data-nav="1" aria-label="${esc(labels.next_month)}">${ARROW('next')}</button></div>
   <div class="hd-cal-week" aria-hidden="true">${weekdays.map(w=>`<span>${esc(w)}</span>`).join('')}</div>
-  <div class="hd-cal-grid" role="grid">${days.map(iso=>{const cls=[iso.slice(0,7)!==view?'outside':'',iso===selected?'selected':'',iso===today?'today':''].filter(Boolean).join(' ');return `<button type="button" role="gridcell" data-date="${iso}" class="${cls}" tabindex="${iso===focus?0:-1}" aria-label="${esc(longDay(iso))}" aria-selected="${iso===selected}" ${disabled(iso)?'disabled':''}>${Number(iso.slice(8))}</button>`;}).join('')}</div>
+  <div class="hd-cal-grid" role="grid">${days.map((iso,n)=>{const cls=[iso.slice(0,7)!==view?'outside':'',iso===selected?'selected':'',iso===today?'today':''].filter(Boolean).join(' ');return `${n%7===0?'<div role="row">':''}<button type="button" role="gridcell" data-date="${iso}" class="${cls}" tabindex="${iso===focus?0:-1}" aria-label="${esc(longDay(iso))}" aria-selected="${iso===selected}" ${disabled(iso)?'disabled':''}>${Number(iso.slice(8))}</button>${n%7===6?'</div>':''}`;}).join('')}</div>
   <div class="hd-cal-foot"><button type="button" class="hd-cal-today" data-date="${today}" ${disabled(today)?'disabled':''}>${esc(labels.today)}</button></div>`;
   if(moveFocus)pop.querySelector(`[data-date="${focus}"]:not(.hd-cal-today)`)?.focus({preventScroll:true});
   if(open?.pop===pop)place(pop,trigger,{matchWidth:false});

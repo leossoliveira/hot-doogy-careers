@@ -42,7 +42,7 @@ Any static host works (Cloudflare Pages, Netlify, Vercel, S3). Build with `npm r
 supabase secrets set CAREERS_ALLOWED_ORIGINS=https://careers.hotdoogy.com --project-ref kfnsfnytnnpwptklmbip
 ```
 
-Optional: `CAREERS_IP_SALT` (random string) salts the hashed IP used for throttling.
+Optional: `CAREERS_IP_SALT` (random string) salts the hashed network address used for throttling; when unset the function derives the salt from the service-role secret, so hashes are never reversible with a public value.
 
 ## Database and function source
 

@@ -1,11 +1,11 @@
 // In-page selfie capture. Resolves with a JPEG File or null when cancelled.
 export function captureSelfie(t){
  return new Promise(resolve=>{
-  const root=document.querySelector('#camera-root');
+  const root=document.querySelector('#camera-root'),app=document.querySelector('#app'),opener=document.activeElement;app.inert=true;
   root.innerHTML=`<div class="camera" role="dialog" aria-modal="true" aria-label="${t.take_selfie}"><div class="camera-box"><video autoplay playsinline muted></video><canvas hidden></canvas><p>${t.camera_help}</p><div class="row"><button type="button" class="btn ghost" data-cam="cancel">${t.cancel}</button><button type="button" class="btn ghost" data-cam="retake" hidden>${t.retake}</button><button type="button" class="btn primary" data-cam="shoot">${t.take_selfie}</button><button type="button" class="btn primary" data-cam="use" hidden>${t.use_photo}</button></div></div></div>`;
   const video=root.querySelector('video'),canvas=root.querySelector('canvas'),btn=k=>root.querySelector(`[data-cam=${k}]`);
   let stream=null,blob=null;
-  const finish=value=>{stream?.getTracks().forEach(x=>x.stop());root.innerHTML='';document.removeEventListener('keydown',onKey);resolve(value);};
+  const finish=value=>{stream?.getTracks().forEach(x=>x.stop());root.innerHTML='';document.removeEventListener('keydown',onKey);app.inert=false;opener?.focus?.();resolve(value);};
   const onKey=e=>{if(e.key==='Escape')finish(null);};
   document.addEventListener('keydown',onKey);
   navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:960},height:{ideal:720}},audio:false}).then(s=>{stream=s;video.srcObject=s;}).catch(()=>{root.querySelector('p').textContent=t.camera_denied;btn('shoot').hidden=true;});

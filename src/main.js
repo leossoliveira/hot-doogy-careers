@@ -47,7 +47,7 @@ const entries=obj=>Object.entries(obj);
 function stepAbout(){
  return `<h2 class="step-title">${t.about_title}</h2><p class="step-desc">${ENFORCE_REQUIRED?t.about_desc:t.about_desc_open}</p>
  <div class="grid">${input('first_name',t.first_name,{autocomplete:'given-name',attrs:'maxlength="100"'})}${input('last_name',t.last_name,{autocomplete:'family-name',attrs:'maxlength="100"'})}
- ${input('email',t.email,{type:'email',autocomplete:'email',attrs:'maxlength="254" inputmode="email"'})}${input('phone',t.phone,{type:'tel',autocomplete:'tel',attrs:'maxlength="32" inputmode="tel"'})}
+ ${input('email',t.email,{type:'email',autocomplete:'email',attrs:'maxlength="254" inputmode="email" spellcheck="false" autocapitalize="off"'})}${input('phone',t.phone,{type:'tel',autocomplete:'tel',attrs:'maxlength="32" inputmode="tel"'})}
  ${input('city',t.city,{autocomplete:'address-level2',attrs:'maxlength="100"'})}${input('state',t.state,{autocomplete:'address-level1',attrs:'maxlength="40"'})}</div>
  <div class="divider"></div>
  <div class="grid">${select('location',t.preferred_location,[...LOCATIONS.map(l=>[l.code,l.name]),['either',t.either]])}${select('position',t.position,entries(t.positions))}
@@ -57,7 +57,7 @@ function stepAvailability(){
  return `<h2 class="step-title">${t.avail_title}</h2><p class="step-desc">${t.avail_desc}</p>
  <div class="grid">${input('earliest_start',t.earliest_start,{type:'date',attrs:`min="${today()}"`})}${select('hours_per_week',t.hours_per_week,entries(t.hours))}</div>
  <div class="field full availability" data-field="availability"><div class="availability-head"><strong>${t.days_title}${req()}</strong><p class="hint">${t.days_hint}</p></div>
- <div class="days">${DAYS.map(d=>{const a=data.availability[d];return `<div class="day${a.on?' on':''}" data-day="${d}"><label><input type="checkbox" data-day-toggle="${d}" ${a.on?'checked':''}> ${t.days[d]}</label><div class="times"><input type="time" data-day-from="${d}" value="${a.from}" aria-label="${t.days[d]} from" step="900"><span aria-hidden="true">–</span><input type="time" data-day-to="${d}" value="${a.to}" aria-label="${t.days[d]} to" step="900"></div><span class="state">${a.on?t.available:t.unavailable}</span></div>`;}).join('')}</div><span class="err" id="e-availability"></span></div>`;}
+ <div class="days">${DAYS.map(d=>{const a=data.availability[d];return `<div class="day${a.on?' on':''}" data-day="${d}"><label><input type="checkbox" data-day-toggle="${d}" ${a.on?'checked':''}> ${t.days[d]}</label><div class="times"><input type="time" data-day-from="${d}" value="${a.from}" aria-label="${t.days[d]} · ${t.start_time}" step="900"><span aria-hidden="true">–</span><input type="time" data-day-to="${d}" value="${a.to}" aria-label="${t.days[d]} · ${t.end_time}" step="900"></div><span class="state">${a.on?t.available:t.unavailable}</span></div>`;}).join('')}</div><span class="err" id="e-availability"></span></div>`;}
 
 function fileCard(kind){
  const f=files[kind],isSelfie=kind==='selfie';
@@ -76,7 +76,7 @@ function stepExperience(){
 function stepReview(){
  const loc=data.location==='either'?t.either:LOCATIONS.find(l=>l.code===data.location)?.name||'—';
  const avail=DAYS.filter(d=>data.availability[d].on).map(d=>`${t.days[d]}: ${data.availability[d].from}–${data.availability[d].to}`);
- const section=(title,target,body)=>`<section><h3>${title}<button type="button" data-goto="${target}">${t.edit}</button></h3>${body}</section>`;
+ const section=(title,target,body)=>`<section><h3>${title}<button type="button" data-goto="${target}" aria-label="${t.edit}: ${e(title)}">${t.edit}</button></h3>${body}</section>`;
  return `<h2 class="step-title">${t.review_title}</h2><p class="step-desc">${t.review_desc}</p><div class="review">
  ${section(t.contact_position,0,`<p class="name">${e(data.first_name)} ${e(data.last_name)}</p><p class="muted">${e(data.email)}<br>${e(data.phone)}<br>${e(data.city)}, ${e(data.state)}</p><p>${e(t.positions[data.position]||'—')} · ${e(loc)}</p><p class="muted">${t.at_least}: ${data.at_least_16==='true'?t.yes:t.no}<br>${t.authorized}: ${data.work_authorized==='true'?t.yes:t.no}</p>`)}
  ${section(t.avail_title,1,`<p>${t.start_date}: ${e(formatDate(data.earliest_start,lang))} · ${e(t.hours[data.hours_per_week]||'—')}</p><p class="muted">${avail.map(e).join('<br>')||'—'}</p>`)}
@@ -123,7 +123,7 @@ function validateStep(){
   if(!on.length)fail('availability',t.err_days);else if(on.some(d=>!(data.availability[d].from<data.availability[d].to)))fail('availability',t.err_times);}
  if(step===2){pick(['work_experience','english_proficiency']);}
  if(step===3){const c=$('[data-field="consent"]');c?.classList.toggle('invalid',!data.consent);if(!data.consent){ok=false;formError=t.err_consent;}}
- if(!ok){const first=$('.invalid');(first?.querySelector('.picker-trigger,input:not([type=hidden]),textarea')||first)?.focus();first?.scrollIntoView({block:'center',behavior:'smooth'});}
+ if(!ok){const first=$('.invalid');(first?.querySelector('.picker-trigger,input:not([type=hidden]),textarea')||first)?.focus();first?.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
  return ok;}
 function checkFile(kind,file){if(!file)return '';const okTypes=kind==='selfie'?['image/jpeg','image/png']:['application/pdf','image/jpeg','image/png'];return (!okTypes.includes(file.type)||file.size>MAX_FILE||file.size===0)?(kind==='selfie'?t.err_photo:t.err_file):'';}
 
@@ -144,9 +144,13 @@ async function submit(){
 }
 
 function scrollTop(){const body=$('.step-body');if(body)body.scrollTop=0;}
+function goStep(next,{push=true}={}){step=Math.max(0,Math.min(3,next));formError='';if(push)history.pushState({step},'');render();scrollTop();$('.step-title')?.focus();}
+window.addEventListener('popstate',ev=>{if(result)return;const target=Number.isInteger(ev.state?.step)?ev.state.step:0;step=target;formError='';render();scrollTop();});
+history.replaceState({step},'');
+const refocusUpload=kind=>$(`[data-field="${kind}"] .btn.small`)?.focus();
 // ---- Events ----
 const form=$('#form');
-form.addEventListener('submit',ev=>{ev.preventDefault();formError='';if(!validateStep()){render();return;}if(step<3){step++;render();scrollTop();$('.step-title')?.focus();}else submit();});
+form.addEventListener('submit',ev=>{ev.preventDefault();formError='';if(!validateStep()){render();return;}if(step<3)goStep(step+1);else submit();});
 form.addEventListener('input',ev=>{const el=ev.target;if(el.name&&el.name in data&&el.type!=='checkbox'){data[el.name]=el.value;el.classList.remove('placeholder');setError(el.name,'');saveDraft();}
  const d=el.dataset.dayFrom||el.dataset.dayTo;if(d){data.availability[d][el.dataset.dayFrom?'from':'to']=el.value;setError('availability','');saveDraft();}});
 form.addEventListener('change',async ev=>{const el=ev.target;
@@ -154,11 +158,11 @@ form.addEventListener('change',async ev=>{const el=ev.target;
  if(el.name==='consent'){data.consent=el.checked;el.closest('.consent').classList.remove('invalid');formError='';$('.form-error').hidden=true;return;}
  if(el.dataset.file){const kind=el.dataset.file,file=el.files?.[0]||null;const problem=checkFile(kind,file);setError(kind,problem);files[kind]=problem?null:file;render();}});
 form.addEventListener('click',async ev=>{const el=ev.target.closest('button');if(!el)return;
- if(el.dataset.back!==undefined){step=Math.max(0,step-1);formError='';render();scrollTop();}
- else if(el.dataset.goto!==undefined){step=Number(el.dataset.goto);formError='';render();scrollTop();}
- else if(el.dataset.remove){files[el.dataset.remove]=null;render();}
- else if(el.dataset.camera!==undefined){const file=await captureSelfie(t);if(file){files.selfie=file;setError('selfie','');render();}}
- else if(el.dataset.restart!==undefined){result=null;step=0;render();}});
+ if(el.dataset.back!==undefined)goStep(step-1);
+ else if(el.dataset.goto!==undefined)goStep(Number(el.dataset.goto));
+ else if(el.dataset.remove){const kind=el.dataset.remove;files[kind]=null;render();refocusUpload(kind);}
+ else if(el.dataset.camera!==undefined){const file=await captureSelfie(t);if(file){files.selfie=file;setError('selfie','');render();}refocusUpload('selfie');}
+ else if(el.dataset.restart!==undefined){result=null;goStep(0);}});
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
 window.addEventListener('beforeunload',ev=>{if(!result&&step>0&&!submitting){ev.preventDefault();}});
 setLang(lang);
