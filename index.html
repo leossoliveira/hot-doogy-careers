@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fece07">
+<meta name="description" content="Apply to join the HOT DOOGY team in Natick, MA. About 5 minutes, no résumé required.">
+<meta name="robots" content="index,follow">
+<title>Careers · HOT DOOGY</title>
+<link rel="icon" href="/brand/hot-doogy-icon.svg">
+<link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#panel">Skip to application</a>
+<div id="app" class="shell">
+ <header class="topbar">
+  <a class="brand" href="/" aria-label="HOT DOOGY Careers"><img src="/brand/hot-doogy-wordmark.svg" alt="HOT DOOGY" width="134" height="44"><small data-i18n="careers">CAREERS</small></a>
+  <div class="lang" role="group" aria-label="Language">
+   <button type="button" data-lang="en" aria-pressed="true">EN</button>
+   <button type="button" data-lang="pt" aria-pressed="false">PT</button>
+  </div>
+ </header>
+ <main class="card">
+  <aside class="side" aria-label="About this application">
+   <span class="eyebrow" data-i18n="eyebrow">Good food. Great people.</span>
+   <h1 data-i18n="headline">Make your next move.</h1>
+   <p class="lede" data-i18n="lede">Join the team behind Hot Doogy.</p>
+   <ul class="locations" id="side-locations"></ul>
+   <ol class="steps" id="side-steps"></ol>
+   <img class="cutout" src="/brand/hot-dog-cutout.png" alt="" aria-hidden="true">
+   <p class="side-foot"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-i18n="duration">About 5 minutes · No résumé required</span></p>
+  </aside>
+  <section class="panel" id="panel" aria-live="polite">
+   <div class="progress">
+    <span class="progress-label" data-i18n="your_application">YOUR APPLICATION</span>
+    <span class="progress-count" id="progress-count">1 / 4</span>
+    <div class="progress-bar" aria-hidden="true"><i id="progress-fill"></i></div>
+   </div>
+   <form id="form" novalidate></form>
+  </section>
+ </main>
+ <footer class="foot"><span>© <span id="year"></span> Hot Doogy</span><span aria-hidden="true">·</span><a href="https://ops.hotdoogy.com" rel="noopener" data-i18n="management">Management sign in</a></footer>
+</div>
+<div id="camera-root"></div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

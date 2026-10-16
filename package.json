@@ -1,0 +1,19 @@
+{
+  "name": "hot-doogy-careers",
+  "version": "0.1.0",
+  "description": "HOT DOOGY Careers — public job application site (careers subdomain).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5174",
+    "test": "node --test tests/"
+  },
+  "type": "module",
+  "devDependencies": {
+    "vite": "^6.4.4"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=24 <25"
+  }
+}
