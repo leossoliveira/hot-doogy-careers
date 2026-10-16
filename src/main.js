@@ -6,6 +6,10 @@ const ENDPOINT=`${SUPABASE_URL}/functions/v1/careers-submit`;
 const MAX_FILE=5*1024*1024;
 const DAYS=['sun','mon','tue','wed','thu','fri','sat'];
 const DRAFT_KEY='hd-careers-draft';
+// Temporary: required-field checks are off so every step can be clicked through while the
+// flow is reviewed. Set back to true before launch. The careers-submit function still
+// validates on submit, so an incomplete application is rejected with a message.
+const ENFORCE_REQUIRED=false;
 const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=(sel,root=document)=>root.querySelector(sel);
 
@@ -26,13 +30,13 @@ function setLang(next){lang=next;t=STRINGS[lang];document.documentElement.lang=l
  render();}
 
 // ---- Field helpers ----
-const req=()=>`<span class="req" aria-hidden="true">*</span>`;
+const req=()=>ENFORCE_REQUIRED?`<span class="req" aria-hidden="true">*</span>`:'';
 const label=(key,text,optional=false)=>`<span id="l-${key}">${e(text)}${optional?`<span class="opt">${t.optional}</span>`:req()}</span>`;
 function input(key,text,{type='text',autocomplete='',optional=false,attrs='',full=false}={}){
- return `<label class="field${full?' full':''}" data-field="${key}">${label(key,text,optional)}<input name="${key}" type="${type}" value="${e(data[key])}" ${optional?'':'required'} ${autocomplete?`autocomplete="${autocomplete}"`:''} ${attrs} aria-describedby="e-${key}"><span class="err" id="e-${key}"></span></label>`;}
+ return `<label class="field${full?' full':''}" data-field="${key}">${label(key,text,optional)}<input name="${key}" type="${type}" value="${e(data[key])}" ${optional||!ENFORCE_REQUIRED?'':'required'} ${autocomplete?`autocomplete="${autocomplete}"`:''} ${attrs} aria-describedby="e-${key}"><span class="err" id="e-${key}"></span></label>`;}
 function select(key,text,options,{optional=false,full=false}={}){
  const value=data[key];
- return `<label class="field${full?' full':''}" data-field="${key}">${label(key,text,optional)}<select name="${key}" ${optional?'':'required'} class="${value?'':'placeholder'}" aria-describedby="e-${key}"><option value="" ${value?'':'selected'} disabled hidden>${t.select}</option>${options.map(([v,l])=>`<option value="${e(v)}" ${String(v)===String(value)?'selected':''}>${e(l)}</option>`).join('')}</select><span class="err" id="e-${key}"></span></label>`;}
+ return `<label class="field${full?' full':''}" data-field="${key}">${label(key,text,optional)}<select name="${key}" ${optional||!ENFORCE_REQUIRED?'':'required'} class="${value?'':'placeholder'}" aria-describedby="e-${key}"><option value="" ${value?'':'selected'} disabled hidden>${t.select}</option>${options.map(([v,l])=>`<option value="${e(v)}" ${String(v)===String(value)?'selected':''}>${e(l)}</option>`).join('')}</select><span class="err" id="e-${key}"></span></label>`;}
 function textarea(key,text,{optional=true,attrs=''}={}){
  return `<label class="field full" data-field="${key}">${label(key,text,optional)}<textarea name="${key}" ${attrs}>${e(data[key])}</textarea><span class="err" id="e-${key}"></span></label>`;}
 const yesNo=[['true',t.yes],['false',t.no]];
@@ -40,7 +44,7 @@ const entries=obj=>Object.entries(obj);
 
 // ---- Steps ----
 function stepAbout(){
- return `<h2 class="step-title">${t.about_title}</h2><p class="step-desc">${t.about_desc}</p>
+ return `<h2 class="step-title">${t.about_title}</h2><p class="step-desc">${ENFORCE_REQUIRED?t.about_desc:t.about_desc_open}</p>
  <div class="grid">${input('first_name',t.first_name,{autocomplete:'given-name',attrs:'maxlength="100"'})}${input('last_name',t.last_name,{autocomplete:'family-name',attrs:'maxlength="100"'})}
  ${input('email',t.email,{type:'email',autocomplete:'email',attrs:'maxlength="254" inputmode="email"'})}${input('phone',t.phone,{type:'tel',autocomplete:'tel',attrs:'maxlength="32" inputmode="tel"'})}
  ${input('city',t.city,{autocomplete:'address-level2',attrs:'maxlength="100"'})}${input('state',t.state,{autocomplete:'address-level1',attrs:'maxlength="40"'})}</div>
@@ -102,6 +106,7 @@ function render(){
 // ---- Validation ----
 function setError(key,message){const field=$(`[data-field="${key}"]`);if(!field)return;field.classList.toggle('invalid',!!message);const err=field.querySelector('.err');if(err)err.textContent=message||'';}
 function validateStep(){
+ if(!ENFORCE_REQUIRED)return true;
  let ok=true;const fail=(k,m)=>{setError(k,m);ok=false;};
  const need=(keys)=>keys.forEach(k=>{setError(k,'');if(!String(data[k]||'').trim())fail(k,t.err_required);});
  const pick=(keys)=>keys.forEach(k=>{setError(k,'');if(!data[k])fail(k,t.err_select);});
@@ -124,7 +129,7 @@ async function submit(){
  if(submitting)return;submitting=true;formError='';render();
  const fd=new FormData();
  for(const k of ['first_name','last_name','email','phone','city','state','position','at_least_16','work_authorized','earliest_start','hours_per_week','work_experience','english_proficiency','other_languages','pitch','referral_source'])fd.append(k,data[k]??'');
- fd.append('locale',lang);fd.append('consent','true');fd.append('any_location',String(data.location==='either'));if(data.location!=='either')fd.append('preferred_location_code',data.location);
+ fd.append('locale',lang);fd.append('consent',String(data.consent));fd.append('any_location',String(data.location==='either'));if(data.location!=='either')fd.append('preferred_location_code',data.location);
  fd.append('availability',JSON.stringify(DAYS.filter(d=>data.availability[d].on).map(d=>({day:d,from:data.availability[d].from,to:data.availability[d].to}))));
  fd.append('website',$('[name=website]')?.value||'');
  if(files.resume)fd.append('resume',files.resume,files.resume.name);if(files.selfie)fd.append('selfie',files.selfie,files.selfie.name);

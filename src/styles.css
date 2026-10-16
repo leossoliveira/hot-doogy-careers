@@ -117,7 +117,7 @@ a{color:inherit}
 .consent.invalid{color:var(--red-52)}
 
 /* Buttons */
-.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto;padding-top:28px;border-top:1px solid var(--border)}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:36px;padding-top:28px;border-top:1px solid var(--border)}
 .actions .spacer{flex:1}
 .actions .private{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 26px;border-radius:var(--radius-s);border:1px solid transparent;font-weight:700;font-size:14px;transition:transform .15s,background .15s,opacity .15s}
