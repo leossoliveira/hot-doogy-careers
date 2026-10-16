@@ -91,7 +91,6 @@ a{color:inherit}
 .availability-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-bottom:10px}
 .availability-head strong{font-size:13px}
 .days{display:grid;gap:8px}
-@container (min-width:660px){.days{grid-template-columns:1fr 1fr}.day .picker-time .picker-trigger{width:92px;font-size:12px;padding:0 7px 0 9px}.day .picker-time .picker-trigger svg{width:13px;height:13px}.day .times{gap:4px}.day .times>span{font-size:12px}}
 .day{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;min-height:clamp(46px,6vh,54px);border:1px solid var(--line);border-radius:var(--radius-s);padding:5px 6px 5px 14px;background:var(--gray-100);transition:border-color .15s,background .15s}
 .day.on{border-color:var(--line-strong);background:var(--gray-97)}
 .day label{display:flex;align-items:center;gap:10px;font-weight:500;font-size:14px;cursor:pointer;min-height:36px;min-width:0}
@@ -102,6 +101,15 @@ a{color:inherit}
 .day .picker-time .picker-trigger{width:118px;min-height:36px;height:36px;padding:0 9px 0 11px;border-radius:6px;font-size:13px;font-variant-numeric:tabular-nums}
 .day .state{font-size:12px;color:var(--text-muted);justify-self:end;padding-right:8px}
 .day.on .state{display:none}
+/* Two columns on wide panels: compact times without the clock icon so the day name always fits. */
+@container (min-width:680px){
+ .days{grid-template-columns:1fr 1fr}
+ .availability .day .picker-time .picker-trigger{width:88px;font-size:12px;padding:0 8px;justify-content:center}
+ .availability .day .picker-time .picker-trigger svg{display:none}
+ .availability .day .times{gap:4px}
+ .availability .day .times>span{font-size:12px}
+ .availability .day label{white-space:nowrap}
+}
 
 /* ---- Uploads ---- */
 .uploads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:clamp(12px,2vh,18px)}
