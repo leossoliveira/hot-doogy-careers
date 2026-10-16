@@ -56,7 +56,7 @@ function stepAbout(){
 function stepAvailability(){
  return `<h2 class="step-title">${t.avail_title}</h2><p class="step-desc">${t.avail_desc}</p>
  <div class="grid">${input('earliest_start',t.earliest_start,{type:'date',attrs:`min="${today()}"`})}${select('hours_per_week',t.hours_per_week,entries(t.hours))}</div>
- <div class="field full" data-field="availability" style="margin-top:18px"><span>${t.days_title}${req()}</span><p class="hint" style="margin:0">${t.days_hint}</p>
+ <div class="field full availability" data-field="availability"><div class="availability-head"><strong>${t.days_title}${req()}</strong><p class="hint">${t.days_hint}</p></div>
  <div class="days">${DAYS.map(d=>{const a=data.availability[d];return `<div class="day${a.on?' on':''}" data-day="${d}"><label><input type="checkbox" data-day-toggle="${d}" ${a.on?'checked':''}> ${t.days[d]}</label><div class="times"><input type="time" data-day-from="${d}" value="${a.from}" aria-label="${t.days[d]} from" step="900"><span aria-hidden="true">–</span><input type="time" data-day-to="${d}" value="${a.to}" aria-label="${t.days[d]} to" step="900"></div><span class="state">${a.on?t.available:t.unavailable}</span></div>`;}).join('')}</div><span class="err" id="e-availability"></span></div>`;}
 
 function fileCard(kind){
@@ -64,7 +64,7 @@ function fileCard(kind){
  const icon=isSelfie?`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`
   :`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>`;
  const chosen=f?`<div class="chosen">${isSelfie?`<img src="${URL.createObjectURL(f)}" alt="">`:''}<span>${e(f.name)} · ${Math.max(1,Math.round(f.size/1024))} KB</span><button type="button" data-remove="${kind}" aria-label="${t.remove}">✕</button></div>`:'';
- return `<div class="upload" data-field="${kind}">${icon}<strong>${isSelfie?t.selfie_title:t.resume_title}</strong><small>${isSelfie?t.selfie_hint:t.resume_hint}</small>
+ return `<div class="upload" data-field="${kind}"><div class="upload-head">${icon}<strong>${isSelfie?t.selfie_title:t.resume_title}</strong></div><small>${isSelfie?t.selfie_hint:t.resume_hint}</small>
  <div class="row"><label class="btn small">${isSelfie?t.choose_photo:t.choose_file}<input type="file" data-file="${kind}" accept="${isSelfie?'image/jpeg,image/png':'application/pdf,image/jpeg,image/png'}" ${isSelfie?'capture="user"':''}></label>${isSelfie&&navigator.mediaDevices?.getUserMedia?`<button type="button" class="btn small" data-camera>${t.take_selfie}</button>`:''}</div>${chosen}<span class="err" id="e-${kind}"></span></div>`;}
 
 function stepExperience(){
@@ -96,10 +96,11 @@ function render(){
  $('#side-steps').innerHTML=t.steps.map((s,i)=>`<li ${i===step&&!result?'aria-current="step"':''} class="${i<step||result?'done':''}"><i>${i<step||result?'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>':String(i+1).padStart(2,'0')}</i>${e(s)}</li>`).join('');
  $('#progress-count').textContent=`${result?4:step+1} / 4`;$('#progress-fill').style.width=`${(result?4:step+1)*25}%`;
  $('#year').textContent=new Date().getFullYear();
- if(result){closePicker();form.innerHTML=success();return;}
+ if(result){closePicker();document.body.dataset.step='done';form.innerHTML=`<div class="step-body">${success()}</div>`;return;}
  const body=[stepAbout,stepAvailability,stepExperience,stepReview][step]();
  const last=step===3;
- form.innerHTML=`${body}<p class="form-error" role="alert" ${formError?'':'hidden'}>${e(formError)}</p>
+ document.body.dataset.step=String(step);
+ form.innerHTML=`<div class="step-body">${body}<p class="form-error" role="alert" ${formError?'':'hidden'}>${e(formError)}</p></div>
  <div class="actions">${step>0?`<button type="button" class="btn ghost" data-back>${t.back}</button>`:`<span class="private"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>${t.private}</span>`}<span class="spacer"></span><button type="submit" class="btn primary" ${submitting?'disabled':''}>${last?(submitting?t.submitting:t.submit):t.continue}</button></div>`;
  enhanceFields(form,{lang,labels:{select:t.select,today:t.today,today_iso:today(),prev_month:t.prev_month,next_month:t.next_month,choose_date:t.choose_date,date_placeholder:t.date_placeholder}});
  if(!formError)form.querySelector('.step-title')?.setAttribute('tabindex','-1');
@@ -139,12 +140,13 @@ async function submit(){
   if(!r.ok)throw Error(value.error||t.err_generic);
   result=value;data=blank();files={resume:null,selfie:null};try{sessionStorage.removeItem(DRAFT_KEY);}catch{}
  }catch(err){formError=err.name==='TimeoutError'||err.name==='TypeError'?t.err_network:err.message;}
- finally{submitting=false;render();window.scrollTo({top:0,behavior:'smooth'});}
+ finally{submitting=false;render();scrollTop();}
 }
 
+function scrollTop(){const body=$('.step-body');if(body)body.scrollTop=0;}
 // ---- Events ----
 const form=$('#form');
-form.addEventListener('submit',ev=>{ev.preventDefault();formError='';if(!validateStep()){render();return;}if(step<3){step++;render();window.scrollTo({top:0,behavior:'smooth'});$('.step-title')?.focus();}else submit();});
+form.addEventListener('submit',ev=>{ev.preventDefault();formError='';if(!validateStep()){render();return;}if(step<3){step++;render();scrollTop();$('.step-title')?.focus();}else submit();});
 form.addEventListener('input',ev=>{const el=ev.target;if(el.name&&el.name in data&&el.type!=='checkbox'){data[el.name]=el.value;el.classList.remove('placeholder');setError(el.name,'');saveDraft();}
  const d=el.dataset.dayFrom||el.dataset.dayTo;if(d){data.availability[d][el.dataset.dayFrom?'from':'to']=el.value;setError('availability','');saveDraft();}});
 form.addEventListener('change',async ev=>{const el=ev.target;
@@ -152,8 +154,8 @@ form.addEventListener('change',async ev=>{const el=ev.target;
  if(el.name==='consent'){data.consent=el.checked;el.closest('.consent').classList.remove('invalid');formError='';$('.form-error').hidden=true;return;}
  if(el.dataset.file){const kind=el.dataset.file,file=el.files?.[0]||null;const problem=checkFile(kind,file);setError(kind,problem);files[kind]=problem?null:file;render();}});
 form.addEventListener('click',async ev=>{const el=ev.target.closest('button');if(!el)return;
- if(el.dataset.back!==undefined){step=Math.max(0,step-1);formError='';render();window.scrollTo({top:0,behavior:'smooth'});}
- else if(el.dataset.goto!==undefined){step=Number(el.dataset.goto);formError='';render();window.scrollTo({top:0,behavior:'smooth'});}
+ if(el.dataset.back!==undefined){step=Math.max(0,step-1);formError='';render();scrollTop();}
+ else if(el.dataset.goto!==undefined){step=Number(el.dataset.goto);formError='';render();scrollTop();}
  else if(el.dataset.remove){files[el.dataset.remove]=null;render();}
  else if(el.dataset.camera!==undefined){const file=await captureSelfie(t);if(file){files.selfie=file;setError('selfie','');render();}}
  else if(el.dataset.restart!==undefined){result=null;step=0;render();}});

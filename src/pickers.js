@@ -10,6 +10,8 @@ const CHECK='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke=
 const ARROW=d=>`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d==='prev'?'m15 18-6-6 6-6':'m9 18 6-6-6-6'}"/></svg>`;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let open=null,uid=0;
+// Phones get bottom sheets with a backdrop instead of anchored popovers.
+const sheetMode=()=>window.matchMedia('(max-width: 640px)').matches;
 
 const intl=lang=>lang==='pt'?'pt-BR':'en-US';
 export function formatDate(iso,lang){if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||''))return '';const [y,m,d]=iso.split('-').map(Number);return new Intl.DateTimeFormat(intl(lang),{month:'2-digit',day:'2-digit',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(y,m-1,d)));}
@@ -22,6 +24,7 @@ const addMonths=(iso,n)=>{const d=utc(iso),day=d.getUTCDate();d.setUTCDate(1);d.
 function emit(input,value){input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}
 
 function place(pop,trigger,{matchWidth=true}={}){
+ if(pop.classList.contains('sheet'))return;
  const r=trigger.getBoundingClientRect(),vw=document.documentElement.clientWidth,vh=window.innerHeight,gap=6;
  if(matchWidth)pop.style.width=`${Math.max(r.width,170)}px`;
  const w=pop.offsetWidth,h=pop.offsetHeight,below=vh-r.bottom-gap-12,above=r.top-gap-12;
@@ -33,17 +36,20 @@ function place(pop,trigger,{matchWidth=true}={}){
 }
 
 export function closePicker(restoreFocus=false){
- if(!open)return;const {pop,trigger,cleanup}=open;open=null;cleanup();pop.remove();trigger.setAttribute('aria-expanded','false');trigger.closest('.picker')?.classList.remove('open');if(restoreFocus)trigger.focus();
+ if(!open)return;const {pop,trigger,cleanup,backdrop}=open;open=null;cleanup();pop.remove();backdrop?.remove();trigger.setAttribute('aria-expanded','false');trigger.closest('.picker')?.classList.remove('open');if(restoreFocus)trigger.focus();
 }
 
-function openPopover(trigger,pop,{matchWidth=true,onKey}={}){
- closePicker();pop.classList.add('hd-pop');document.body.append(pop);trigger.setAttribute('aria-expanded','true');trigger.closest('.picker')?.classList.add('open');
+function openPopover(trigger,pop,{matchWidth=true,onKey,title=''}={}){
+ closePicker();pop.classList.add('hd-pop');
+ let backdrop=null;
+ if(sheetMode()){pop.classList.add('sheet');pop.insertAdjacentHTML('afterbegin',`<div class="hd-sheet-head">${esc(title)}</div>`);backdrop=document.createElement('div');backdrop.className='hd-backdrop';backdrop.addEventListener('pointerdown',()=>closePicker(true));document.body.append(backdrop);}
+ document.body.append(pop);trigger.setAttribute('aria-expanded','true');trigger.closest('.picker')?.classList.add('open');
  const reposition=()=>{if(!trigger.isConnected){closePicker();return;}place(pop,trigger,{matchWidth});};
- const outside=e=>{if(!pop.contains(e.target)&&!trigger.contains(e.target))closePicker();};
+ const outside=e=>{if(!pop.contains(e.target)&&!trigger.contains(e.target)&&e.target!==backdrop)closePicker();};
  const key=e=>{if(e.key==='Escape'){e.preventDefault();closePicker(true);}else if(e.key==='Tab'){closePicker();}else onKey?.(e);};
  reposition();
  window.addEventListener('resize',reposition);window.addEventListener('scroll',reposition,true);document.addEventListener('pointerdown',outside,true);pop.addEventListener('keydown',key);
- open={pop,trigger,cleanup:()=>{window.removeEventListener('resize',reposition);window.removeEventListener('scroll',reposition,true);document.removeEventListener('pointerdown',outside,true);}};
+ open={pop,trigger,backdrop,cleanup:()=>{window.removeEventListener('resize',reposition);window.removeEventListener('scroll',reposition,true);document.removeEventListener('pointerdown',outside,true);}};
 }
 
 // ---- Listbox (selects and time slots) ----
@@ -56,7 +62,7 @@ function openListbox(trigger,options,current,onPick,{label}={}){
  const setActive=(i,scroll=true)=>{active=Math.max(0,Math.min(items.length-1,i));items.forEach((el,n)=>el.classList.toggle('active',n===active));list.setAttribute('aria-activedescendant',items[active].id);if(scroll)items[active].scrollIntoView({block:'nearest'});};
  const pick=i=>{const o=options[i];closePicker(true);onPick(o.value);};
  let typed='',typedAt=0;
- openPopover(trigger,pop,{onKey:e=>{
+ openPopover(trigger,pop,{title:label,onKey:e=>{
   if(e.key==='ArrowDown'){e.preventDefault();setActive(active+1);}
   else if(e.key==='ArrowUp'){e.preventDefault();setActive(active-1);}
   else if(e.key==='Home'){e.preventDefault();setActive(0);}
@@ -123,7 +129,7 @@ function openCalendar(trigger,input,{lang,labels,onPick}){
  const moveTo=(iso,f=true)=>{if(disabled(iso))iso=min;focus=iso;if(iso.slice(0,7)!==view)view=iso.slice(0,7);draw(f);};
  pop.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.dataset.nav){view=addMonths(`${view}-01`,Number(b.dataset.nav)).slice(0,7);focus=`${view}-01`;if(disabled(focus))focus=min;draw(false);return;}if(b.dataset.date){closePicker(true);onPick(b.dataset.date);}});
  draw(false);
- openPopover(trigger,pop,{matchWidth:false,onKey:e=>{
+ openPopover(trigger,pop,{matchWidth:false,title:labels.choose_date,onKey:e=>{
   if(!e.target.closest('.hd-cal-grid'))return;
   const step={ArrowLeft:-1,ArrowRight:1,ArrowUp:-7,ArrowDown:7}[e.key];
   if(step){e.preventDefault();moveTo(addDays(focus,step));}
