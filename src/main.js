@@ -1,5 +1,6 @@
 import {STRINGS,LOCATIONS,detectLocale} from './i18n.js';
 import {captureSelfie} from './selfie.js';
+import {enhanceFields,formatDate,closePicker} from './pickers.js';
 
 const SUPABASE_URL=import.meta.env.VITE_SUPABASE_URL||'https://kfnsfnytnnpwptklmbip.supabase.co';
 const ENDPOINT=`${SUPABASE_URL}/functions/v1/careers-submit`;
@@ -78,7 +79,7 @@ function stepReview(){
  const section=(title,target,body)=>`<section><h3>${title}<button type="button" data-goto="${target}">${t.edit}</button></h3>${body}</section>`;
  return `<h2 class="step-title">${t.review_title}</h2><p class="step-desc">${t.review_desc}</p><div class="review">
  ${section(t.contact_position,0,`<p class="name">${e(data.first_name)} ${e(data.last_name)}</p><p class="muted">${e(data.email)}<br>${e(data.phone)}<br>${e(data.city)}, ${e(data.state)}</p><p>${e(t.positions[data.position]||'—')} · ${e(loc)}</p><p class="muted">${t.at_least}: ${data.at_least_16==='true'?t.yes:t.no}<br>${t.authorized}: ${data.work_authorized==='true'?t.yes:t.no}</p>`)}
- ${section(t.avail_title,1,`<p>${t.start_date}: ${e(data.earliest_start)} · ${e(t.hours[data.hours_per_week]||'—')}</p><p class="muted">${avail.map(e).join('<br>')||'—'}</p>`)}
+ ${section(t.avail_title,1,`<p>${t.start_date}: ${e(formatDate(data.earliest_start,lang))} · ${e(t.hours[data.hours_per_week]||'—')}</p><p class="muted">${avail.map(e).join('<br>')||'—'}</p>`)}
  ${section(t.exp_title,2,`<p>${e(t.experience[data.work_experience]||'—')} · ${t.english}: ${e(t.english_levels[data.english_proficiency]||'—')}</p>${data.other_languages?`<p class="muted">${e(data.other_languages)}</p>`:''}${data.pitch?`<p class="muted">“${e(data.pitch)}”</p>`:''}<p class="muted">${files.resume?t.resume_attached:t.no_resume}<br>${files.selfie?t.selfie_attached:t.no_selfie}</p>`)}
  </div>
  <div class="privacy"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>${t.privacy}</span></div>
@@ -95,11 +96,12 @@ function render(){
  $('#side-steps').innerHTML=t.steps.map((s,i)=>`<li ${i===step&&!result?'aria-current="step"':''} class="${i<step||result?'done':''}"><i>${i<step||result?'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>':String(i+1).padStart(2,'0')}</i>${e(s)}</li>`).join('');
  $('#progress-count').textContent=`${result?4:step+1} / 4`;$('#progress-fill').style.width=`${(result?4:step+1)*25}%`;
  $('#year').textContent=new Date().getFullYear();
- if(result){form.innerHTML=success();return;}
+ if(result){closePicker();form.innerHTML=success();return;}
  const body=[stepAbout,stepAvailability,stepExperience,stepReview][step]();
  const last=step===3;
  form.innerHTML=`${body}<p class="form-error" role="alert" ${formError?'':'hidden'}>${e(formError)}</p>
  <div class="actions">${step>0?`<button type="button" class="btn ghost" data-back>${t.back}</button>`:`<span class="private"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>${t.private}</span>`}<span class="spacer"></span><button type="submit" class="btn primary" ${submitting?'disabled':''}>${last?(submitting?t.submitting:t.submit):t.continue}</button></div>`;
+ enhanceFields(form,{lang,labels:{select:t.select,today:t.today,today_iso:today(),prev_month:t.prev_month,next_month:t.next_month,choose_date:t.choose_date,date_placeholder:t.date_placeholder}});
  if(!formError)form.querySelector('.step-title')?.setAttribute('tabindex','-1');
 }
 
@@ -120,7 +122,7 @@ function validateStep(){
   if(!on.length)fail('availability',t.err_days);else if(on.some(d=>!(data.availability[d].from<data.availability[d].to)))fail('availability',t.err_times);}
  if(step===2){pick(['work_experience','english_proficiency']);}
  if(step===3){const c=$('[data-field="consent"]');c?.classList.toggle('invalid',!data.consent);if(!data.consent){ok=false;formError=t.err_consent;}}
- if(!ok){const first=$('.invalid');(first?.querySelector('input,select,textarea')||first)?.focus();first?.scrollIntoView({block:'center',behavior:'smooth'});}
+ if(!ok){const first=$('.invalid');(first?.querySelector('.picker-trigger,input:not([type=hidden]),textarea')||first)?.focus();first?.scrollIntoView({block:'center',behavior:'smooth'});}
  return ok;}
 function checkFile(kind,file){if(!file)return '';const okTypes=kind==='selfie'?['image/jpeg','image/png']:['application/pdf','image/jpeg','image/png'];return (!okTypes.includes(file.type)||file.size>MAX_FILE||file.size===0)?(kind==='selfie'?t.err_photo:t.err_file):'';}
 
