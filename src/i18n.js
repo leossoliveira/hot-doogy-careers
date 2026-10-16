@@ -2,7 +2,7 @@
 export const STRINGS = {
  en: {
   careers:'CAREERS', eyebrow:'Good food. Great people.', headline:'Make your next move.', lede:'Join the team behind Hot Doogy.',
-  duration:'About 5 minutes · No résumé required', your_application:'YOUR APPLICATION', management:'Management sign in',
+  duration:'About 5 minutes', your_application:'YOUR APPLICATION',
   steps:['About you','Availability','Experience','Review & submit'],
   about_title:'About you', about_desc:'Let’s start with the basics. Fields marked * are required.',
   first_name:'First name', last_name:'Last name', email:'Email', phone:'Phone', city:'City', state:'State',
@@ -35,7 +35,7 @@ export const STRINGS = {
  },
  pt: {
   careers:'CARREIRAS', eyebrow:'Boa comida. Grandes pessoas.', headline:'Dê o seu próximo passo.', lede:'Faça parte do time por trás do Hot Doogy.',
-  duration:'Cerca de 5 minutos · Currículo não obrigatório', your_application:'SUA CANDIDATURA', management:'Acesso da gerência',
+  duration:'Cerca de 5 minutos', your_application:'SUA CANDIDATURA',
   steps:['Sobre você','Disponibilidade','Experiência','Revisar e enviar'],
   about_title:'Sobre você', about_desc:'Vamos começar pelo básico. Campos marcados com * são obrigatórios.',
   first_name:'Nome', last_name:'Sobrenome', email:'E-mail', phone:'Telefone', city:'Cidade', state:'Estado',
