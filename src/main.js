@@ -56,7 +56,7 @@ function stepAvailability(){
  return `<h2 class="step-title">${t.avail_title}</h2><p class="step-desc">${t.avail_desc}</p>
  <div class="grid">${input('earliest_start',t.earliest_start,{type:'date',attrs:`min="${today()}"`})}${select('hours_per_week',t.hours_per_week,entries(t.hours))}</div>
  <div class="field full" data-field="availability" style="margin-top:18px"><span>${t.days_title}${req()}</span><p class="hint" style="margin:0">${t.days_hint}</p>
- <div class="days">${DAYS.map(d=>{const a=data.availability[d];return `<div class="day${a.on?' on':''}" data-day="${d}"><label><input type="checkbox" data-day-toggle="${d}" ${a.on?'checked':''}> ${t.days[d]}</label><div class="times"><input type="time" data-day-from="${d}" value="${a.from}" aria-label="${t.days[d]} from" step="900"><span>${t.to}</span><input type="time" data-day-to="${d}" value="${a.to}" aria-label="${t.days[d]} to" step="900"></div><span class="state">${a.on?t.available:t.unavailable}</span></div>`;}).join('')}</div><span class="err" id="e-availability"></span></div>`;}
+ <div class="days">${DAYS.map(d=>{const a=data.availability[d];return `<div class="day${a.on?' on':''}" data-day="${d}"><label><input type="checkbox" data-day-toggle="${d}" ${a.on?'checked':''}> ${t.days[d]}</label><div class="times"><input type="time" data-day-from="${d}" value="${a.from}" aria-label="${t.days[d]} from" step="900"><span aria-hidden="true">–</span><input type="time" data-day-to="${d}" value="${a.to}" aria-label="${t.days[d]} to" step="900"></div><span class="state">${a.on?t.available:t.unavailable}</span></div>`;}).join('')}</div><span class="err" id="e-availability"></span></div>`;}
 
 function fileCard(kind){
  const f=files[kind],isSelfie=kind==='selfie';
