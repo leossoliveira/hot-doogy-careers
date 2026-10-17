@@ -52,3 +52,18 @@ Optional: `CAREERS_IP_SALT` (random string) salts the hashed network address use
 ## Privacy
 
 Applications contain personal data. Only owner/admin accounts with MFA can read them; events are append-only; the throttle table keeps a salted hash of the network address for two days. Correction or deletion requests: thi.andrade@hotdoogy.com.
+
+## Local preview updates
+
+The form supports overnight availability: an end time earlier than the start ends
+on the following day. Equal times are invalid. Apply the accompanying
+`careers_overnight_availability` migration before deploying this frontend; the same
+migration is kept in Operations. Existing daytime entries keep their meaning.
+
+The header offers persistent light/dark themes. Contact details use a fixed US +1
+prefix and Massachusetts (stored as MA). Files are selected locally and sent only
+with the final application through `careers-submit` into private `careers-uploads`.
+Failed attachments are reported separately from a saved application. The Vite dev
+server proxies this submission endpoint without changing production CORS settings.
+Submitting from the preview creates a real application; UI tests should intercept
+the endpoint when using test data.

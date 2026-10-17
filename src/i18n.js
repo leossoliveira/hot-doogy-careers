@@ -1,6 +1,7 @@
 // UI copy. English is the source; Portuguese for Brazilian applicants in Natick.
 export const STRINGS = {
  en: {
+  upload_failed:'Your application was saved, but these attachments could not be uploaded. Contact thi.andrade@hotdoogy.com and include your reference:',next_day:'Next day',light_theme:'Light theme',dark_theme:'Dark theme',us_code:'United States country code +1',
   careers:'CAREERS', eyebrow:'Good food. Great people.', headline:'Make your next move.', lede:'Join the team behind Hot Doogy.',
   duration:'About 5 minutes', your_application:'YOUR APPLICATION',
   steps:['About you','Availability','Experience','Review & submit'],
@@ -12,7 +13,7 @@ export const STRINGS = {
   avail_title:'Availability', avail_desc:'Tell us when you’d be available to work.',
   earliest_start:'Earliest start date', hours_per_week:'Hours per week',
   hours:{under_15:'Under 15 hours',"15_25":'15–25 hours',"25_35":'25–35 hours',full_time:'Full-time (35+ hours)',flexible:'Flexible'},
-  days_title:'Days and times available', days_hint:'Select all days you can work. Times are local to Massachusetts.',
+  days_title:'Days and times available', days_hint:'Select all days you can work. Times are local to Massachusetts. An end time earlier than the start ends the next day.',
   days:{sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'},
   unavailable:'Unavailable', available:'Available', to:'to', today:'Today', start_time:'Start time', end_time:'End time', prev_month:'Previous month', next_month:'Next month', choose_date:'Choose a date', date_placeholder:'MM/DD/YYYY',
   exp_title:'Experience', exp_desc:'First job? That’s a great place to start.',
@@ -30,10 +31,11 @@ export const STRINGS = {
   private:'Your information stays private', back:'Back', continue:'Continue', submit:'Submit application', submitting:'Submitting…',
   success_title:'Application received.', success_body:'Thanks for applying to Hot Doogy. Our team reviews applications within a few business days and will reach out by phone or email.', reference:'Reference',
   another:'Submit another application',
-  err_required:'This field is required.', err_email:'Enter a valid email address.', err_phone:'Enter a valid phone number.', err_select:'Choose an option.', err_age:'Applicants must be at least 16 years old.', err_date:'Choose a date from today onward.', err_days:'Select at least one day you can work.', err_times:'Set a start time earlier than the end time.', err_file:'Use a PDF, JPG or PNG up to 5 MB.', err_photo:'Use a JPG or PNG up to 5 MB.', err_consent:'Please confirm to continue.',
+  err_required:'This field is required.', err_email:'Enter a valid email address.', err_phone:'Enter a valid phone number.', err_select:'Choose an option.', err_age:'Applicants must be at least 16 years old.', err_date:'Choose a date from today onward.', err_days:'Select at least one day you can work.', err_times:'Choose different start and end times.', err_file:'Use a PDF, JPG or PNG up to 5 MB.', err_photo:'Use a JPG or PNG up to 5 MB.', err_consent:'Please confirm to continue.',
   err_network:'We could not reach the server. Check your connection and try again.', err_generic:'We could not save your application. Please try again.',
  },
  pt: {
+  upload_failed:'Sua candidatura foi salva, mas estes anexos não foram enviados. Contate thi.andrade@hotdoogy.com e informe o protocolo:',next_day:'Dia seguinte',light_theme:'Tema claro',dark_theme:'Tema escuro',us_code:'Código dos Estados Unidos +1',
   careers:'CARREIRAS', eyebrow:'Boa comida. Grandes pessoas.', headline:'Dê o seu próximo passo.', lede:'Faça parte do time por trás do Hot Doogy.',
   duration:'Cerca de 5 minutos', your_application:'SUA CANDIDATURA',
   steps:['Sobre você','Disponibilidade','Experiência','Revisar e enviar'],
@@ -45,7 +47,7 @@ export const STRINGS = {
   avail_title:'Disponibilidade', avail_desc:'Conte quando você pode trabalhar.',
   earliest_start:'Data mais próxima para começar', hours_per_week:'Horas por semana',
   hours:{under_15:'Menos de 15 horas',"15_25":'15–25 horas',"25_35":'25–35 horas',full_time:'Período integral (35+ horas)',flexible:'Flexível'},
-  days_title:'Dias e horários disponíveis', days_hint:'Marque todos os dias em que pode trabalhar. Horários locais de Massachusetts.',
+  days_title:'Dias e horários disponíveis', days_hint:'Marque todos os dias em que pode trabalhar. Horários locais de Massachusetts. Uma saída anterior à entrada termina no dia seguinte.',
   days:{sun:'Domingo',mon:'Segunda-feira',tue:'Terça-feira',wed:'Quarta-feira',thu:'Quinta-feira',fri:'Sexta-feira',sat:'Sábado'},
   unavailable:'Indisponível', available:'Disponível', to:'até', today:'Hoje', start_time:'Horário inicial', end_time:'Horário final', prev_month:'Mês anterior', next_month:'Próximo mês', choose_date:'Escolha uma data', date_placeholder:'DD/MM/AAAA',
   exp_title:'Experiência', exp_desc:'Primeiro emprego? Ótimo lugar para começar.',
@@ -63,7 +65,7 @@ export const STRINGS = {
   private:'Suas informações ficam privadas', back:'Voltar', continue:'Continuar', submit:'Enviar candidatura', submitting:'Enviando…',
   success_title:'Candidatura recebida.', success_body:'Obrigado por se candidatar ao Hot Doogy. Nossa equipe analisa as candidaturas em poucos dias úteis e entrará em contato por telefone ou e-mail.', reference:'Protocolo',
   another:'Enviar outra candidatura',
-  err_required:'Campo obrigatório.', err_email:'Informe um e-mail válido.', err_phone:'Informe um telefone válido.', err_select:'Escolha uma opção.', err_age:'É preciso ter pelo menos 16 anos.', err_date:'Escolha uma data a partir de hoje.', err_days:'Marque pelo menos um dia disponível.', err_times:'O horário inicial deve ser antes do final.', err_file:'Use PDF, JPG ou PNG de até 5 MB.', err_photo:'Use JPG ou PNG de até 5 MB.', err_consent:'Confirme para continuar.',
+  err_required:'Campo obrigatório.', err_email:'Informe um e-mail válido.', err_phone:'Informe um telefone válido.', err_select:'Escolha uma opção.', err_age:'É preciso ter pelo menos 16 anos.', err_date:'Escolha uma data a partir de hoje.', err_days:'Marque pelo menos um dia disponível.', err_times:'Escolha horários inicial e final diferentes.', err_file:'Use PDF, JPG ou PNG de até 5 MB.', err_photo:'Use JPG ou PNG de até 5 MB.', err_consent:'Confirme para continuar.',
   err_network:'Não foi possível conectar ao servidor. Verifique sua conexão e tente de novo.', err_generic:'Não foi possível salvar sua candidatura. Tente novamente.',
  },
 };

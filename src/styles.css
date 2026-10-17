@@ -301,3 +301,27 @@ a{color:inherit}
  .step-body{overflow:visible}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Theme and fixed contact details */
+:root[data-theme=dark]{color-scheme:dark;--gray-100:#202521;--gray-97:#141715;--gray-96:#2b312c;--gray-95:#343d35;--ink:#f3f5ef;--ink-2:#27240c;--text-muted:#b8c2b3;--border:#364037;--line:#465048;--line-strong:#65715e;--yellow-hi:#51450e;--focus:#fece07;--red-52:#ffaaa3;--red-97:#402422}
+.header-controls{display:flex;align-items:center;gap:12px}
+.theme-switch{display:flex;padding:3px;border:1px solid var(--border);border-radius:999px;background:var(--gray-100)}
+.theme-switch button{display:grid;place-items:center;width:34px;min-height:34px;border:0;border-radius:50%;color:var(--text-muted);background:transparent}
+.theme-switch button:hover{background:var(--gray-96)}
+.theme-switch button[aria-pressed=true]{color:var(--gray-100);background:var(--ink)}
+.phone-control{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius-s);background:var(--gray-100);min-width:0}
+.phone-country{display:flex;align-items:center;gap:8px;padding:0 12px;white-space:nowrap;border-right:1px solid var(--line);font-size:14px}
+.phone-control input{min-width:0;border:0;background:transparent}
+.phone-control:focus-within{border-color:var(--focus);box-shadow:var(--ring)}
+.phone-control input:focus{box-shadow:none}
+.field input[readonly]{background:var(--gray-97);color:var(--text-muted)}
+.day .overnight{grid-column:1/-1;text-align:right;color:var(--text-muted);font-size:11px;padding-right:4px}
+.day .overnight[hidden]{display:none}
+:root[data-theme=dark] .side{--ink:#171918;--ink-2:#27240c}
+:root[data-theme=dark] .btn.primary,:root[data-theme=dark] .lang button[aria-pressed=true],:root[data-theme=dark] .hd-cal-grid button.selected{color:#171918}
+:root[data-theme=dark] .btn.primary:hover{background:#dce3d7}
+:root[data-theme=dark] .field.invalid input,:root[data-theme=dark] .field.invalid textarea,:root[data-theme=dark] .field.invalid .picker-trigger{background:var(--red-97)}
+:root[data-theme=dark] .success .badge,:root[data-theme=dark] .hd-cal-today{color:#171918}
+.upload.invalid .err{display:block;color:var(--red-52);font-size:12px}
+.upload.invalid{border-color:var(--red-52)}
+@media(max-width:640px){.header-controls{gap:6px}.theme-switch button{width:32px;min-height:40px}}
